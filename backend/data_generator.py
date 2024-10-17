@@ -20,7 +20,7 @@ class TrafficDataGenerator:
             traffic_level = self.calculate_traffic_level(vehicles, average_speed)
             
             data[intersection] = {
-                'traffic_level': traffic_level,
+                'traffic_level': f"{traffic_level} congestion",
                 'vehicles': vehicles,
                 'average_speed': average_speed
             }
