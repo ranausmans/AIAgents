@@ -1,9 +1,12 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from backend.data_generator import TrafficDataGenerator
 from backend.ai_agents import TrafficMonitoringAgent, SignalControlAgent, PublicCommunicationAgent, PredictiveAnalysisAgent
 import logging
 
 app = Flask(__name__)
+
+# Add this line to handle the /aitraffic/ prefix
+app.config['APPLICATION_ROOT'] = '/aitraffic'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,13 +23,26 @@ def index():
 
 @app.route('/simulate', methods=['POST'])
 def simulate():
+    # Add some logging here
+    app.logger.info(f"Received simulate request. Headers: {request.headers}")
+    app.logger.info(f"Request data: {request.get_data()}")
+    
     logger.info("Simulation requested")
     try:
         traffic_data = traffic_generator.generate_traffic_data()
+        logger.info(f"Generated traffic data: {traffic_data}")
+
         traffic_summary = monitoring_agent.analyze_traffic(traffic_data)
+        logger.info(f"Traffic summary: {traffic_summary}")
+
         signal_adjustments = signal_agent.adjust_signals(traffic_summary, traffic_data)
+        logger.info(f"Signal adjustments: {signal_adjustments}")
+
         public_alert = communication_agent.generate_alert(traffic_summary, signal_adjustments)
+        logger.info(f"Public alert: {public_alert}")
+
         traffic_prediction = predictive_agent.predict_traffic(traffic_data, traffic_summary)
+        logger.info(f"Traffic prediction: {traffic_prediction}")
 
         return jsonify({
             'traffic_data': traffic_data,
